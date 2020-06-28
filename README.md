@@ -40,21 +40,23 @@ For this project, you **don't** need to install Unity. Instead, choose the pre-b
 
 # Instructions
 
-To explore the environment and train the agent, start a jupyter notebook, open Tennis.ipynb and execute the steps. For more information, and an exmaple on how to use the agent, please check instructions inside the notebook.
+To explore the environment and train the agent, start a jupyter notebook, open Tennis_ddpg.ipynb and execute the steps. For more information, and an exmaple on how to use the agent, please check instructions inside the notebook.
 
 ## Project structure
 
-* `Tennis.ipynb`: the jupyter notebook for executing the training
-* `src\agent.py` : the implementation of the DDPG agent
+* `Tennis_ddpg.ipynb`: the jupyter notebook for executing the training of the DDPG agent
+* `Tennis_maddpg.ipynb`: the jupyter notebook for executing the training of the MADDPG agent
+* `src\ddpg.py` : the implementation of the DDPG agent
+* `src\maddpg.py` : the implementation of the DDPG agent
 * `src\model.py` : the PyTorch models of the neural networks used by the Agent
 * `src\replay_buffer.py` : The replay buffer implementation for memory
 * `src\config.py` : the default configuration/hyperparameters of the models
 * `src\noise.py`  : the implementation of the Ornstein-Uhlenbeck process
-
+* `results\`  : contains the trained agents weights
 
 # Results
 
-The trained agent solved the environment in ... episodes.
+The trained agent solved the environment in 969 episodes.
 For a detailed explanation, please read the [project report](./Report.md)
 
 

@@ -11,7 +11,7 @@ import torch.optim as optim
 
 NBR_AGENTS = 2
 
-class MaddpgAgent():
+class DdpgAgent():
     """MADDPG Agent that interacts with and learns from the environment."""
 
     def __init__(self, id, state_size, action_size, config = Config()):
@@ -43,8 +43,7 @@ class MaddpgAgent():
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=config.lr_actor)
 
         # Critic & Target Network
-        # complete state size = observation of each agent + actions of all OTHER agents
-        complete_state_size = state_size*NBR_AGENTS+action_size*(NBR_AGENTS-1)
+        complete_state_size = state_size
         self.critic_local = Critic(complete_state_size, action_size, config.random_seed, config.critic_hidden_units, config.use_bn_critic).to(self.device)
         self.critic_target = Critic(complete_state_size, action_size, config.random_seed, config.critic_hidden_units, config.use_bn_critic).to(self.device)
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=config.lr_critic, weight_decay=config.weight_decay)
@@ -145,19 +144,18 @@ class MaddpgAgent():
             weights (array_like): list of weights for compensation the non-uniform sampling (used only
                                     with prioritized experience replay)
         """
-        states, all_states, actions, other_actions, rewards, next_states, all_next_states, dones = experiences
+        states, _, actions, _, rewards, next_states, _, dones = experiences
 
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
         actions_next = self.actor_target(next_states)
-        other_actions_next = self.actor_target(all_states[:,-self.state_size:])
-        all_next_states = torch.cat((all_next_states, other_actions_next), dim=1)
-        Q_targets_next = self.critic_target(all_next_states, actions_next)
+        Q_targets_next = self.critic_target(next_states, actions_next)
+
         # Compute Q targets for current states (y_i)
         Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
+        
         # Compute critic loss
-        all_states = torch.cat((all_states, other_actions), dim=1)
-        Q_expected = self.critic_local(all_states, actions)
+        Q_expected = self.critic_local(states, actions)
 
         if self.config.use_per:
             td_error = Q_expected - Q_targets
@@ -178,7 +176,7 @@ class MaddpgAgent():
         # ---------------------------- update actor ---------------------------- #
         # Compute actor loss
         actions_pred = self.actor_local(states)
-        actor_loss = -self.critic_local(all_states, actions_pred).mean()
+        actor_loss = -self.critic_local(states, actions_pred).mean()
         # Minimize the loss
         self.actor_optimizer.zero_grad()
         actor_loss.backward()

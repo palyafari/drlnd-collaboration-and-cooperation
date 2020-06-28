@@ -25,7 +25,11 @@ class Actor(nn.Module):
 
         self.use_bn = use_bn
         if use_bn:
-            self.bn = nn.BatchNorm1d(hidden_units[0])
+            self.bns = []
+            for i in range(len(hidden_units)):
+                self.bns.append(nn.BatchNorm1d(hidden_units[i]))
+            self.bns = nn.ModuleList(self.bns)
+
         self.layers = []
         for i in range(len(hidden_units)):
             if i == 0:
@@ -34,6 +38,7 @@ class Actor(nn.Module):
                 self.layers.append(nn.Linear(hidden_units[i-1], hidden_units[i]))
         self.layers.append(nn.Linear(hidden_units[-1], action_size))
         self.layers = nn.ModuleList(self.layers)
+        
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -48,8 +53,8 @@ class Actor(nn.Module):
         x = state
         for i in range(len(self.layers)-1):
             x = F.relu(self.layers[i](x))
-            if self.use_bn and i== 0:
-                x = self.bn(x)
+            if self.use_bn and i < len(self.bns):
+                x = self.bns[i](x)
 
         return F.tanh(self.layers[-1](x))
 
@@ -73,6 +78,13 @@ class Critic(nn.Module):
         self.use_bn = use_bn
         if use_bn:
             self.bn = nn.BatchNorm1d(hidden_units[0])
+
+        if use_bn:
+            self.bns = []
+            for i in range(len(hidden_units)):
+                self.bns.append(nn.BatchNorm1d(hidden_units[i]))
+            self.bns = nn.ModuleList(self.bns)
+        
         self.layers = []
         for i in range(len(hidden_units)-1):
             if i == 0:
@@ -96,8 +108,8 @@ class Critic(nn.Module):
         x = state
         for i in range(len(self.layers)-2):
             x = F.relu(self.layers[i](x))
-            if self.use_bn and i == 0:
-                x = self.bn(x)
+            if self.use_bn and i < len(self.bns):
+                x = self.bns[i](x)
 
         x = torch.cat((x, action), dim=1)
         x = F.relu(self.layers[-2](x))
