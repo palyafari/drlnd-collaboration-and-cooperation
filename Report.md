@@ -49,14 +49,21 @@ The idea of [PER](https://arxiv.org/abs/1511.05952) is to prioritize experiences
 # Results
 
 
-In my experiments I found that using PER helps to learn faster as expected. In the DDPG version I used batch normalization in the actor and the critic network. In the MADDPG version I used  batch normalization only for the actor network. 
-The agent solves the environment in 969 episodes. 
+In my experiments I found that using PER helps to learn faster. In the DDPG version I used batch normalization in the actor and the critic network. In the MADDPG version I used  batch normalization only for the actor network. 
+The DDPG agent solves the environment in 969 episodes. 
+The MADDPG agent needs however 1938 episode to converge using the same hyperparameters as the DDPG agent. Therefore this model needs further investigation.
+
+The following results correspond to the DDPG agent.
 Although I did not do an extensive hyperparameter tuding, I tested multiple network structures with 2-3 hidden layers containing 256-512 units each. I found that the net structure with 2 hidden layers (400 and 300 units) worked best for both actor and critic networks. Using batch normalization and implementing prioritized experience replay led to a faster training.
 
 
 ## Scores
-The following plot shows the scores together with the moving average with a window size of 50:
-![scores](./results/scores.png)
+
+The following plot shows the scores og the MADDPG agent together with the moving average with a window size of 50:
+![Scores of the DDPG agent](./results/ddpg_scores_1250.png)
+
+The following plot shows the scores og the MADDPG agent together with the moving average with a window size of 50:
+![Scores of the MADDPG agent](./results/maddpg_scores_1938.png)
 ## Hyperparameters
 The hyperparamters used by the agent are listed in the following table:
 
@@ -76,13 +83,17 @@ For a more detailed parameter list see `src\config.py`.
 
 
 ## Trained Model
-The trained actor model is in [this file](./results/ddpg_actor.pth).
-The trained critic model is in [this file](./results/ddpg_critic.pth).
+The DDPG model (trained for 969 episodes) can be found here: [actor](./results/ddpg_actor_969.pth), [critic](./results/ddpg_critic_969.pth).
+
+The DDPG model (trained for 969 episodes) can be found here: [actor](./results/ddpg_actor_1250.pth), [critic](./results/ddpg_critic_1250.pth).
+
+The MADDPG model (trained for 1938 episodes) can be found here: [actor](./results/maddpg_actor_1938.pth), [critic](./results/maddpg_critic_1938.pth).
 
 # Ideas for Future Work
+
 **Experiment with different network structure**: The current network structure is just an example. I experimented with a few other ones, and selected the one that worked "the best" but further experiments could definitely lead to better performing structures.
 
-**Explore the models parameter space**: in this project I focused on the implementation and first comparison of the algorithms presented int he course. I used the same hyperparameters for all agents and there is no garantee that those parameters are optimal. Therefore a systematic evaluation of the hyperparameters would be a good start, e.q. using grid search.
+**Explore the models parameter space**: in this project I focused on the implementation and first comparison of the algorithms presented int the course. I used the same hyperparameters for all agents and there is no garantee that those parameters are optimal. Therefore a systematic evaluation of the hyperparameters would be a good start, e.q. using grid search.
 
 **Try parameter space noise** instead of the noise on the action, check [example](https://github.com/jvmncs/ParamNoise).
 
